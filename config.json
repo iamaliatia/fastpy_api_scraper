@@ -1,0 +1,5 @@
+{
+  "target_url": "https://news.ycombinator.com/",
+  "output_file": "results.csv",
+  "timeout": 15
+}

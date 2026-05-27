@@ -1,22 +1,25 @@
 import asyncio
+import json
 from fastpy_scraper.core import FastScraper
-from fastpy_scraper.parsers import save_to_csv
 
-async def test_scraper():
-    # ليستة د البروكسيات للتجربة (اختيارية)
-    custom_proxies = [] 
+# دالة باش نقراو الإعدادات
+def load_config():
+    with open('config.json', 'r') as f:
+        return json.load(f)
+
+async def main():
+    config = load_config()
+    scraper = FastScraper()
     
-    scraper = FastScraper(proxies=custom_proxies)
-    print("🕵️‍♂️ جاري كشط موقع Hacker News بالـ Async...")
+    print(f"🚀 Starting the scraping process for: {config['target_url']}")
     
-    # كشط عناوين الأخبار
-    response = await scraper.scrape_to_json("https://news.ycombinator.com/", ".titleline > a")
+    data = await scraper.scrape(config['target_url'])
     
-    if response["status"] == "success":
-        print(f"✅ لقيت {response['count']} عنوان!")
-        # حفظ ف ملف CSV ديريكت
-        save_to_csv(response["results"], "hacker_news.csv")
+    if data:
+        scraper.save_to_csv(data, config['output_file'])
+        print(f"✅ Data saved successfully to {config['output_file']}")
     else:
-        print(f"❌ مشكل: {response['message']}")
+        print("❌ Failed to retrieve data.")
 
-asyncio.run(test_scraper())
+if __name__ == "__main__":
+    asyncio.run(main())
